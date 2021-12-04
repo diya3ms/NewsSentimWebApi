@@ -17,7 +17,7 @@ namespace NewsSentimWebApi.Services
         private const string SentimURL = "https://sentim-api.herokuapp.com/api/v1/";
         HttpClient client = new HttpClient();
 
-        public IEnumerable<NewsCategoryProlarityResponse> GetNews()
+        public IEnumerable<NewsCategoryProlarityResponse> GetMostPositiveNewsCategory()
         {
             List<NewsCategoryProlarityResponse> newsCategoryProlarityResponse = new List<NewsCategoryProlarityResponse>();
             try
@@ -52,8 +52,48 @@ namespace NewsSentimWebApi.Services
             }
             
         }
+        public NewsCategoryProlarityResponse GetMostPositiveNewsAuthor()
+        {
+            NewsCategoryProlarityResponse mostPositiveAuthor= new NewsCategoryProlarityResponse();
+            mostPositiveAuthor.avgSentimentPolarity = -100;
+            int count = 1;
+            try
+            {
+                // Add an Accept header for JSON format.
+                client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json"));
+                foreach (string category in Enum.GetNames(typeof(NewsCategory)))
+                {
+                    var newsObj = getNewsForCategory(category);
+                    foreach (var data in newsObj.News)
+                    {
+                        var sentimNews = getSentimForNews(data.Content);
+                        if (sentimNews.NewsSentim.Polarity > mostPositiveAuthor.avgSentimentPolarity || mostPositiveAuthor.author.Equals(data.Author))
+                        {
+                            if (mostPositiveAuthor.author.Equals(data.Author))
+                            {
+                                count++;
+                                mostPositiveAuthor.avgSentimentPolarity = (mostPositiveAuthor.avgSentimentPolarity + sentimNews.NewsSentim.Polarity) / count;
+                            }
+                            else
+                            {
+                                mostPositiveAuthor.author = data.Author;
+                                mostPositiveAuthor.avgSentimentPolarity = sentimNews.NewsSentim.Polarity;
+                            }
+                        }
+                    }
+                }
+                client.Dispose();
+                return mostPositiveAuthor;
+            }
+            catch (Exception ex)
+            {
+                client.Dispose();
+                throw;
+            }
+        }
 
-        private NewsDetail getNewsForCategory( string category)
+            private NewsDetail getNewsForCategory( string category)
         {
            var url= URL + category;
            HttpResponseMessage response = client.GetAsync(url).Result;
@@ -76,9 +116,14 @@ namespace NewsSentimWebApi.Services
             };
             var requestContent = new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
             HttpResponseMessage res = client.PostAsync(SentimURL, requestContent).Result;
-            //if (res.IsSuccessStatusCode)
+            if (res.IsSuccessStatusCode)
             {
                return res.Content.ReadAsAsync<SentimDetail>().Result;
+            }
+            else
+            {
+                Console.WriteLine("{0} ({1})", (int)res.StatusCode, res.ReasonPhrase);
+                return null;
             }
         }
 

@@ -1,25 +1,16 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using NewsSentimWebApi.Services;
 using NewsSentimWebApi.Services.Interface;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Unity;
-using Bootstrapcomponents = NewsSentimWebApi.Bootstrap.Bootstrap;
 
 namespace NewsSentimWebApi
 {
     public class Startup
     {
-        private static UnityContainer unityContainer;
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
