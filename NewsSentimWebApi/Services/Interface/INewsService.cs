@@ -5,6 +5,7 @@ namespace NewsSentimWebApi.Services.Interface
 {
     public interface INewsService
     {
-        IEnumerable<NewsCategoryProlarityResponse> GetNews();
+        IEnumerable<NewsCategoryProlarityResponse> GetMostPositiveNewsCategory();
+        NewsCategoryProlarityResponse GetMostPositiveNewsAuthor();
     }
 }
