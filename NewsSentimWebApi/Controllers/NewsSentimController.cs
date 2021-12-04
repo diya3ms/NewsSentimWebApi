@@ -14,15 +14,12 @@ namespace NewsSentimWebApi.Controllers
     [Route("[controller]")]
     public class NewsSentimController : ControllerBase
     {
-        private readonly ILogger<NewsSentimController> _logger;
         private readonly INewsService _newsService;
 
 
-        public NewsSentimController(ILogger<NewsSentimController> logger, INewsService newsService)
+        public NewsSentimController(INewsService newsService)
         {
-            _logger = logger;
-            _newsService = newsService;
-       
+            _newsService = newsService;     
         }
 
         [HttpGet]
