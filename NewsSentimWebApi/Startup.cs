@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NewsSentimWebApi.Services;
 using NewsSentimWebApi.Services.Interface;
-using Unity;
 
 namespace NewsSentimWebApi
 {

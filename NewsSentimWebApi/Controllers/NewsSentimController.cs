@@ -1,11 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using NewsSentimWebApi.Models;
 using NewsSentimWebApi.Services.Interface;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using Unity;
 
 
 namespace NewsSentimWebApi.Controllers
