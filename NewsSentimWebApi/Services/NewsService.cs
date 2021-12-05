@@ -129,10 +129,12 @@ namespace NewsSentimWebApi.Services
                     topNewsArticleList = newsArticleResponses.OrderByDescending(i => i.SentimentPolarity).Take(3).ToList();
                     newsArticleResponses = topNewsArticleList;
                 }
+                client.Dispose();
                 return topNewsArticleList.AsEnumerable();
             }
             catch (Exception ex)
             {
+                client.Dispose();
                 throw;
             }
 
