@@ -55,7 +55,7 @@ namespace NewsSentimWebApi.Services
             }
 
         }
-        public PositiveAuthorResponse GetMostPositiveNewsAuthor()
+        public AuthorPolarityResponse GetMostPositiveNewsAuthor()
         {
             PositiveAuthorResponse mostPositiveAuthor;
             List<PositiveAuthorResponse> mostPositiveAuthorList = new List<PositiveAuthorResponse>();
@@ -99,7 +99,7 @@ namespace NewsSentimWebApi.Services
                 client.Dispose();
                 mostPositiveAuthor=mostPositiveAuthorList.OrderByDescending(i => i.avgSentimentPolarity).First();
                 mostPositiveAuthor.avgSentimentPolarity /= mostPositiveAuthor.count;
-                return mostPositiveAuthor;
+                return parsePositiveAuthorResponse(mostPositiveAuthor);
             }
             catch (Exception ex)
             {
@@ -148,6 +148,15 @@ namespace NewsSentimWebApi.Services
                 category = category,
                 SentimentPolarity = sentimDetail.NewsSentim.Polarity,
                 Title = news.Title
+            };
+        }
+
+        private AuthorPolarityResponse parsePositiveAuthorResponse(PositiveAuthorResponse positiveAuthorResponse)
+        {
+            return new AuthorPolarityResponse
+            {
+                author = positiveAuthorResponse.author,
+                avgSentimentPolarity= positiveAuthorResponse.avgSentimentPolarity
             };
         }
 

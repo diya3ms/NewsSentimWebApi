@@ -27,7 +27,7 @@ namespace NewsSentimWebApi.Controllers
 
         [HttpGet]
         [Route("getMostPositiveNewsAuthor")]
-        public PositiveAuthorResponse GetMostPositiveNewsAuthor()
+        public AuthorPolarityResponse GetMostPositiveNewsAuthor()
         {
             return _newsService.GetMostPositiveNewsAuthor();
         }
