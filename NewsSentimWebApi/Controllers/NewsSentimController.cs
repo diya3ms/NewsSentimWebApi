@@ -31,5 +31,12 @@ namespace NewsSentimWebApi.Controllers
         {
             return _newsService.GetMostPositiveNewsAuthor();
         }
+
+        [HttpGet]
+        [Route("getTop3PositiveArticles")]
+        public IEnumerable<NewsArticleResponse> GetTop3PositiveArticles()
+        {
+            return _newsService.GetTop3PositiveArticles();
+        }
     }
 }
