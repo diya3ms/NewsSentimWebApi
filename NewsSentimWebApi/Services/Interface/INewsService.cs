@@ -7,5 +7,6 @@ namespace NewsSentimWebApi.Services.Interface
     {
         NewsCategoryProlarityResponse GetMostPositiveNewsCategory();
         PositiveAuthorResponse GetMostPositiveNewsAuthor();
+        IEnumerable<NewsArticleResponse> GetTop3PositiveArticles();
     }
 }

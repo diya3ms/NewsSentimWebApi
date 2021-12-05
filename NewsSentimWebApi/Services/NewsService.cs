@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace NewsSentimWebApi.Services
 {
-    public class NewsService: INewsService
+    public class NewsService : INewsService
     {
         private const string URL = "https://inshortsapi.vercel.app/news?category=";
         private const string SentimURL = "https://sentim-api.herokuapp.com/api/v1/";
@@ -19,8 +19,10 @@ namespace NewsSentimWebApi.Services
 
         public NewsCategoryProlarityResponse GetMostPositiveNewsCategory()
         {
-            NewsCategoryProlarityResponse newsCategoryProlarityResponse = new NewsCategoryProlarityResponse();
-            newsCategoryProlarityResponse.avgSentimentPolarity = -100;
+            NewsCategoryProlarityResponse newsCategoryProlarityResponse = new NewsCategoryProlarityResponse
+            {
+                avgSentimentPolarity = -100
+            };
             try
             {
                 // Add an Accept header for JSON format.
@@ -32,10 +34,11 @@ namespace NewsSentimWebApi.Services
                     var newsObj = getNewsForCategory(category);
                     foreach (var data in newsObj.News)
                     {
-                       var sentimNews = getSentimForNews(data.Content);
-                       avgCategorySentiment += sentimNews.NewsSentim.Polarity;
+                        var sentimNews = getSentimForNews(data.Title);
+                        avgCategorySentiment += sentimNews.NewsSentim.Polarity;
                     }
                     avgCategorySentiment /= newsObj.News.Count;
+
                     if (avgCategorySentiment > newsCategoryProlarityResponse.avgSentimentPolarity)
                     {
                         newsCategoryProlarityResponse.category = category;
@@ -45,12 +48,12 @@ namespace NewsSentimWebApi.Services
                 client.Dispose();
                 return newsCategoryProlarityResponse;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 client.Dispose();
                 throw;
             }
-            
+
         }
         public PositiveAuthorResponse GetMostPositiveNewsAuthor()
         {
@@ -66,8 +69,8 @@ namespace NewsSentimWebApi.Services
                     mostPositiveAuthor = initializePositiveAuthorResponse();
                     var newsObj = getNewsForCategory(category);
                     foreach (var data in newsObj.News)
-                    {                       
-                        var sentimNews = getSentimForNews(data.Content);
+                    {
+                        var sentimNews = getSentimForNews(data.Title);
                         if (sentimNews.NewsSentim.Polarity > mostPositiveAuthor.avgSentimentPolarity || mostPositiveAuthor.author.Equals(data.Author))
                         {
                             if (mostPositiveAuthor.author.Equals(data.Author))
@@ -94,7 +97,7 @@ namespace NewsSentimWebApi.Services
                     }
                 }
                 client.Dispose();
-                mostPositiveAuthor = mostPositiveAuthorList.Where(i => i.avgSentimentPolarity.Equals(mostPositiveAuthorList.Max(j => j.avgSentimentPolarity))).First();
+                mostPositiveAuthor=mostPositiveAuthorList.OrderByDescending(i => i.avgSentimentPolarity).First();
                 mostPositiveAuthor.avgSentimentPolarity /= mostPositiveAuthor.count;
                 return mostPositiveAuthor;
             }
@@ -104,6 +107,48 @@ namespace NewsSentimWebApi.Services
                 throw;
             }
         }
+
+        public IEnumerable<NewsArticleResponse> GetTop3PositiveArticles()
+        {
+            List<SentimDetail> sentimDetailsList = new List<SentimDetail>();
+            List<NewsArticleResponse> topNewsArticleList = new List<NewsArticleResponse>();
+            List<NewsArticleResponse> newsArticleResponses = new List<NewsArticleResponse>();
+            try
+            {
+                // Add an Accept header for JSON format.
+                client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json"));
+                foreach (string category in Enum.GetNames(typeof(NewsCategory)))
+                {
+                    var newsObj = getNewsForCategory(category);
+                    foreach (var data in newsObj.News)
+                    {
+                        var sentimNews = getSentimForNews(data.Title);
+                        newsArticleResponses.Add(parseSentimDetail(sentimNews, data, category));
+                    }
+                    topNewsArticleList = newsArticleResponses.OrderByDescending(i => i.SentimentPolarity).Take(3).ToList();
+                    newsArticleResponses = topNewsArticleList;
+                }
+                return topNewsArticleList.AsEnumerable();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+        }
+
+        private NewsArticleResponse parseSentimDetail(SentimDetail sentimDetail, News news, string category)
+        {
+            return new NewsArticleResponse
+            {
+                Author = news.Author,
+                category = category,
+                SentimentPolarity = sentimDetail.NewsSentim.Polarity,
+                Title = news.Title
+            };
+        }
+
 
         private NewsDetail getNewsForCategory( string category)
         {
