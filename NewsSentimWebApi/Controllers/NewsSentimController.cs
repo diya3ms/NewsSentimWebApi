@@ -20,14 +20,14 @@ namespace NewsSentimWebApi.Controllers
 
         [HttpGet]
         [Route("getMostPositiveNewsCategory")]
-        public IEnumerable<NewsCategoryProlarityResponse> GetMostPositiveNewsCategory()
+        public NewsCategoryProlarityResponse GetMostPositiveNewsCategory()
         {
             return  _newsService.GetMostPositiveNewsCategory();
         }
 
         [HttpGet]
         [Route("getMostPositiveNewsAuthor")]
-        public NewsCategoryProlarityResponse GetMostPositiveNewsAuthor()
+        public PositiveAuthorResponse GetMostPositiveNewsAuthor()
         {
             return _newsService.GetMostPositiveNewsAuthor();
         }
